@@ -12,7 +12,7 @@ class SpaceStationData(BaseModel):
     power_level: float = Field(ge=0.0, le=100.0)
     oxygen_level: float = Field(ge=0.0, le=100.0)
     last_maintenance:
-    is_operational: bool = Field(delault = True)
+    is_operational: bool = Field(delault=True)
     notes: str | None = None
     @
 

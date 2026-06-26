@@ -26,17 +26,17 @@ class AlienContact(BaseModel):
     def contact_validate(self) -> "AlienContact":
         if not self.contact_id.startswith("AC"):
             raise ValueError(
-                "Contact ID must  start "
+                "Contact ID must start "
                 "with 'AC' (Alien Contact)")
-        elif self.contact_type == ContactType.PHYSICAL:
+        if self.contact_type == ContactType.PHYSICAL:
             if not self.is_verified:
                 raise ValueError("Physical contact reports must be verified")
-        elif self.contact_type == ContactType.TELEPATHIC:
+        if self.contact_type == ContactType.TELEPATHIC:
             if self.witness_count < 3:
                 raise ValueError(
                     "Telepathic contact "
                     "requires at least 3 witnesses")
-        elif self.signal_strength > 7.0:
+        if self.signal_strength > 7.0:
             if not self.message_received:
                 raise ValueError(
                     "Strong signals (> 7.0) "
@@ -83,7 +83,9 @@ def main() -> None:
     except ValidationError as e:
         print("Expected validation error:")
         for error in e.errors():
-            print(f"{error['msg']}")
+            ctx = error.get('ctx', {})
+            msg = str(ctx['error']) if 'error' in ctx else error['msg']
+            print(msg)
 
 
 if __name__ == "__main__":

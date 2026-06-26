@@ -1,4 +1,4 @@
-#!_usr/bin/env python3
+#! /usr/bin/env python3
 
 from pydantic import BaseModel, Field, ValidationError, model_validator
 from enum import Enum
@@ -64,7 +64,7 @@ class SpaceMission(BaseModel):
             if num_experienced/len(self.crew) < 0.5:
                 raise ValueError(
                     "Long missions (> 365 days) need"
-                    " 50%% experienced crew (5+ years)")
+                    " 50% experienced crew (5+ years)")
         return self
 
     @model_validator(mode="after")
@@ -171,7 +171,9 @@ def main() -> None:
     except ValidationError as e:
         print("Expected validation error:")
         for error in e.errors():
-            print(error["msg"])
+            ctx = error.get('ctx', {})
+            msg = str(ctx['error']) if 'error' in ctx else error['msg']
+            print(msg)
 
 
 if __name__ == "__main__":

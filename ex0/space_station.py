@@ -32,7 +32,7 @@ def main() -> None:
     print("Valid station created:")
     print(f"ID: {valid_ss.station_id}")
     print(f"Name: {valid_ss.name}")
-    print(f"Crew: {valid_ss.crew_size} peoplr")
+    print(f"Crew: {valid_ss.crew_size} people")
     print(f"Power: {valid_ss.power_level}%")
     print(f"Oxygen: {valid_ss.oxygen_level}%")
     # print(f"last maintenance datetime: {valid_ss.last_maintenance}")

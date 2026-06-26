@@ -32,16 +32,16 @@ def main() -> None:
     print("Valid station created:")
     print(f"ID: {valid_ss.station_id}")
     print(f"Name: {valid_ss.name}")
-    print(f"Crew: {valid_ss.crew_size}")
-    print(f"Power: {valid_ss.power_level}")
-    print(f"Oxygen: {valid_ss.oxygen_level}")
-    print(f"last maintenance datetime: {valid_ss.last_maintenance}")
-    if valid_ss.notes:
-        print(f"notes: {valid_ss.notes}")
+    print(f"Crew: {valid_ss.crew_size} peoplr")
+    print(f"Power: {valid_ss.power_level}%")
+    print(f"Oxygen: {valid_ss.oxygen_level}%")
+    # print(f"last maintenance datetime: {valid_ss.last_maintenance}")
+    # if valid_ss.notes:
+    #     print(f"notes: {valid_ss.notes}")
     if valid_ss.is_operational:
         print("Status: Operational")
     else:
-        print("Status: non-Oparational")
+        print("Status: non-Operational")
     print()
     print("========================================")
     print("Expected validation error:")
@@ -58,7 +58,8 @@ def main() -> None:
             )
         print(invalid_ss.station_id)
     except ValidationError as e:
-        print(e)
+        for error in e.errors():
+            print(f"{error['msg']}")
 
 
 if __name__ == "__main__":

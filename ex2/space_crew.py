@@ -3,12 +3,14 @@
 from pydantic import BaseModel, Field, ValidationError, model_validator
 from enum import Enum
 from datetime import datetime
+
+
 class Rank(Enum):
-    cadet="cadet"
-    officer="officer"
-    lieutenant="lieutenant"
-    captain="captain"
-    commander="commander"
+    CADET: str = "cadet"
+    OFFICER: str = "officer"
+    LIEUTENANT: str = "lieutenant"
+    CAPTAIN: str = "captain"
+    COMMANDER: str = "commander"
 
 
 class CrewMember(BaseModel):
@@ -17,7 +19,7 @@ class CrewMember(BaseModel):
     rank: Rank
     age: int = Field(ge=18, le=80)
     specialization: str = Field(min_length=3, max_length=30)
-    year_experience: int = Field(ge=0, le=50)
+    years_experience: int = Field(ge=0, le=50)
     is_active: bool = True
 
 
@@ -30,43 +32,51 @@ class SpaceMission(BaseModel):
     crew: list[CrewMember] = Field(min_length=1, max_length=12)
     mission_status: str = "planned"
     budget_millions: float = Field(ge=1.0, le=10000.0)
+
     @model_validator(mode="after")
-    def validate_mission_id(self) -> self:
+    def validate_mission_id(self) -> "SpaceMission":
         if not self.mission_id.startswith("M"):
-            raise ValidationError("Mission Id must start with 'M'")
+            raise ValueError("Mission Id must start with 'M'")
         return self
-    
+
     @model_validator(mode="after")
-    def validate_crew_mem(self) -> self:
+    def validate_crew_mem(self) -> "SpaceMission":
         list_commander: list[CrewMember] = []
         list_captain: list[CrewMember] = []
         for mem in self.crew:
-            if mem.rank == Rank.commander:
+            if mem.rank == Rank.COMMANDER:
                 list_commander.append(mem)
-            elif mem.rank == Rank.captain:
-                list_commander.append(mem)
-        if len(list_commander) < 1 or len(list_captain) < 1:
-            raise ValidationError("Mission must have at least one Commander or Captain")
+            elif mem.rank == Rank.CAPTAIN:
+                list_captain.append(mem)
+        if len(list_commander) < 1 and len(list_captain) < 1:
+            raise ValueError(
+                "Mission must have at least "
+                "one Commander or Captain")
+        return self
 
     @model_validator(mode="after")
-    def validate_long_mission(self) -> self:
-        if self.duration_days>365:
+    def validate_long_mission(self) -> "SpaceMission":
+        if self.duration_days > 365:
             num_experienced: int = 0
             for mem in self.crew:
-                if mem.year_experience > 5:
+                if mem.years_experience > 5:
                     num_experienced += 1
             if num_experienced/len(self.crew) < 0.5:
-                raise ValidationError("Long missions (> 365 days) need 50%% experienced crew (5+ years)")
-    
+                raise ValueError(
+                    "Long missions (> 365 days) need"
+                    " 50%% experienced crew (5+ years)")
+        return self
+
     @model_validator(mode="after")
-    def validate_status(self) -> self:
+    def validate_status(self) -> "SpaceMission":
         for mem in self.crew:
             if not mem.is_active:
-                raise ValidationError("All crew members must be active")
+                raise ValueError("All crew members must be active")
         return self
-    
+
 
 def main() -> None:
+    print("Space Mission Crew Validation")
     print("=========================================")
     valid_crews = [
         CrewMember(
@@ -94,7 +104,7 @@ def main() -> None:
             years_experience=5,
         ),
     ]
-    
+
     valid_mission = SpaceMission(
         mission_id="M2024_MARS",
         mission_name="Mars Colony Establishment",
@@ -121,3 +131,48 @@ def main() -> None:
         )
 
     print("\n=========================================")
+
+    invalid_crews = [
+        CrewMember(
+            member_id="CM001",
+            name="Sarah Connor",
+            rank=Rank.CADET,
+            age=42,
+            specialization="Mission Command",
+            years_experience=15,
+        ),
+        CrewMember(
+            member_id="CM002",
+            name="John Smith",
+            rank=Rank.LIEUTENANT,
+            age=35,
+            specialization="Navigation",
+            years_experience=8,
+        ),
+        CrewMember(
+            member_id="CM003",
+            name="Alice Johnson",
+            rank=Rank.OFFICER,
+            age=29,
+            specialization="Engineering",
+            years_experience=5,
+        ),
+    ]
+    try:
+        _ = SpaceMission(
+            mission_id="M2143_CA",
+            mission_name="Centaur Alpha Exploring",
+            destination="Centaur Alpha",
+            launch_date=datetime.now(),
+            duration_days=2000,
+            crew=invalid_crews,
+            budget_millions=100.0
+        )
+    except ValidationError as e:
+        print("Expected validation error:")
+        for error in e.errors():
+            print(error["msg"])
+
+
+if __name__ == "__main__":
+    main()

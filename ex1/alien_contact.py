@@ -5,10 +5,10 @@ from pydantic import BaseModel, Field, model_validator, ValidationError
 
 
 class ContactType(Enum):
-    RADIO: str = "radio"
-    VISUAL: str = "visual"
-    PHYSICAL: str = "physical"
-    TELEPATHIC: str = "telepathic"
+    RADIO = "radio"
+    VISUAL = "visual"
+    PHYSICAL = "physical"
+    TELEPATHIC = "telepathic"
 
 
 class AlienContact(BaseModel):

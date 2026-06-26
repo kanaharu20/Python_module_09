@@ -6,11 +6,11 @@ from datetime import datetime
 
 
 class Rank(Enum):
-    CADET: str = "cadet"
-    OFFICER: str = "officer"
-    LIEUTENANT: str = "lieutenant"
-    CAPTAIN: str = "captain"
-    COMMANDER: str = "commander"
+    CADET = "cadet"
+    OFFICER = "officer"
+    LIEUTENANT = "lieutenant"
+    CAPTAIN = "captain"
+    COMMANDER = "commander"
 
 
 class CrewMember(BaseModel):
